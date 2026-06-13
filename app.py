@@ -9,13 +9,14 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 import json
-import requests
+from flask_cors import CORS
 
 from flask import Flask, jsonify, request, send_from_directory
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
 app = Flask(__name__)
+CORS(app)
 
 SESSION_TTL_SECONDS = 5 * 60
 SESSION_SALT = secrets.token_hex(16)
