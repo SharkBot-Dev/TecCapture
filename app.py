@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 import json
+import requests
 
 from flask import Flask, jsonify, request, send_from_directory
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -34,6 +35,16 @@ captcha_sessions: dict[str, CaptchaSession] = {}
 def index():
     return send_from_directory(app.root_path, "test.html")
 
+@app.post("/")
+def index_post():
+    payload = request.get_json(silent=True) or request.form or request.args
+    session_id = payload.get("sessionId") or payload.get("session_id") or payload.get("tec_capture_session_id")
+    session = captcha_sessions.pop(session_id, None) if session_id else None
+
+    if not session or session.expires_at < time.time():
+        return "認証できていません。"
+
+    return "認証が完了しました！"
 
 @app.get("/capture.js")
 def capture_js():
